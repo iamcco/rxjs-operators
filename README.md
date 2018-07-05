@@ -6,7 +6,7 @@
 
 操作符    | 状态
 -------   |-----
-[bufferMap](./src/bufferMap/READMD.md) | Done
+[bufferMap](https://github.com/iamcco/rxjs-operators/tree/master/src/bufferMap) | Done
 
 ## install
 
@@ -18,7 +18,7 @@ npm install --save rxjs-operators
 
 ```javascript
 import Rx from 'rxjs'
-import 'rxjs-operators'
+import 'rxjs-operators' // or import 'rxjs-operators/lib/bufferMap'
 
 Rx.Observable
   .interval(1000)
