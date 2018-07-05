@@ -1,8 +1,8 @@
 {
   "name": "rxjs-operators",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "more operators, more happines",
-  "main": "./src/index.js",
+  "main": "./lib/index.js",
   "scripts": {
     "build": "babel src --out-dir lib",
     "test": "echo \"Error: no test specified\" && exit 1"
