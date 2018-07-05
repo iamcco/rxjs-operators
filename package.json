@@ -1,0 +1,37 @@
+{
+  "name": "rxjs-operators",
+  "version": "1.0.0",
+  "description": "more operators, more happines",
+  "main": "./src/index.js",
+  "scripts": {
+    "build": "babel src --out-dir lib",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iamcco/rxjs-operators.git"
+  },
+  "keywords": [
+    "rxjs",
+    "operators"
+  ],
+  "author": "年糕小豆汤 <ooiss@qq.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iamcco/rxjs-operators/issues"
+  },
+  "homepage": "https://github.com/iamcco/rxjs-operators#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "eslint": "^5.0.1",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-import": "^2.13.0",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-promise": "^3.8.0",
+    "eslint-plugin-standard": "^3.1.0"
+  },
+  "dependencies": {
+    "rxjs": "^5.5.10"
+  }
+}
