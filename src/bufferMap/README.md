@@ -1,9 +1,13 @@
 # bufferMap
 
-将值映射成内部 Observable，并按顺序订阅和发出
+收集源输出的值，并把值作为数组发出
 
-> 和 concatMap 不同之处在于，源发出一个值之后，如果内部源没有完成，这些值会被缓存起来，
-> 直到内部源完成后这些缓存起来的值会作为一个数组调用
+> bufferMap 和 concatMap 很相近, 不同之处在于，bufferMap 会对源输出的值进行缓存，
+> 并映射成内部 Observable，在这个内部 Observable 没有完成前，
+> 源发出的值会一直缓存到内部 Observable 完成并映射成新的内部 Observable，
+> 而 concatMap 会对源发出的值按顺序映射成内部 Observable
+> 简单来说就是 concatMap 会对源发出的每个值按顺序映射成 Observable，
+> 而 bufferMap 会对源发出的值的缓存映射成 Observable
 
 ```javascript
 Rx.Observable
