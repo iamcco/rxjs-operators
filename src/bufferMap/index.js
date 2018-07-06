@@ -5,30 +5,31 @@ Observable.prototype.bufferMap = function (factory) {
   let values = []
   let isComplete = false
   let isPending = false
-  const next = observer => (arg) => {
-    if (arg !== undefined) {
-      values.push(arg)
-    }
-    if (!isPending) {
-      isPending = true
-      const params = values
-      values = []
-      try {
-        return factory(params).subscribe({
-          next: (res) => observer.next(res),
-          error: err => observer.error(err),
-          complete: () => {
-            isPending = false
-            if (values.length) {
-              next(observer)()
-            } else if (isComplete) {
-              observer.complete()
-            }
+  const doNext = (observer) => {
+    isPending = true
+    const params = values
+    values = []
+    try {
+      return factory(params).subscribe({
+        next: (res) => observer.next(res),
+        error: err => observer.error(err),
+        complete: () => {
+          isPending = false
+          if (values.length) {
+            doNext(observer)
+          } else if (isComplete) {
+            observer.complete()
           }
-        })
-      } catch (err) {
-        return observer.error(err)
-      }
+        }
+      })
+    } catch (err) {
+      return observer.error(err)
+    }
+  }
+  const next = observer => (arg) => {
+    values.push(arg)
+    if (!isPending) {
+      doNext(observer)
     }
   }
   return new Observable(observer => preObservable.subscribe({
