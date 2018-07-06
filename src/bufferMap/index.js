@@ -40,6 +40,9 @@ Observable.prototype.bufferMap = function (factory) {
     },
     complete: () => {
       isComplete = true
+      if (!values.length && !isPending) {
+        observer.complete()
+      }
     }
   }))
 }
