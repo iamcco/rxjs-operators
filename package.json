@@ -1,6 +1,6 @@
 {
   "name": "rxjs-operators",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "description": "more operators, more happines",
   "main": "./lib/index.js",
   "scripts": {
@@ -35,5 +35,9 @@
   "dependencies": {
     "rxjs": "^5.5.10"
   },
-  "files": ["./lib", "./README.md", "./package.json"]
+  "files": [
+    "lib",
+    "README.md",
+    "package.json"
+  ]
 }
