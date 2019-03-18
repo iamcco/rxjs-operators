@@ -1,2 +1,0 @@
-// bufferMap
-require('./bufferMap')

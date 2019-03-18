@@ -7,24 +7,27 @@
 操作符    | 状态
 -------   |-----
 [bufferMap](https://github.com/iamcco/rxjs-operators/tree/master/src/bufferMap) | Done
+[waitMap](https://github.com/iamcco/rxjs-operators/tree/master/src/waitMap) | Done
 
 ## install
 
 ```bash
-npm install --save rxjs-operators
+yarn add rxjs-operators
 ```
 
 ## usage
 
 ```javascript
-import Rx from 'rxjs'
-import 'rxjs-operators' // or import 'rxjs-operators/lib/bufferMap'
+import { interval, timer } from 'rxjs'
+import { map } from 'rxjs/operators'
+import { bufferMap } from 'rxjs-operators'
 
-Rx.Observable
-  .interval(1000)
-  .bufferMap((arr) => {
-     console.log('map:', arr);
-     return Rx.Observable.timer(10000).map(() =>  arr)
+interval(1000).pipe(
+  bufferMap((arr) => {
+   console.log('map:', arr);
+   return timer(10000).pipe(
+     map(() =>  arr)
+   )
   })
-  .subscribe(res => console.log('sub:', res))
+).subscribe(res => console.log('sub:', res))
 ```

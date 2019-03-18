@@ -1,10 +1,11 @@
 {
   "name": "rxjs-operators",
-  "version": "1.0.7",
+  "version": "1.1.0",
   "description": "more operators, more happines",
   "main": "./lib/index.js",
   "scripts": {
-    "build": "babel src --out-dir lib",
+    "watch": "tsc -w -p ./",
+    "build": "tsc -p ./",
     "test": "npm run build && jest ./test"
   },
   "repository": {
@@ -22,18 +23,16 @@
   },
   "homepage": "https://github.com/iamcco/rxjs-operators#readme",
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "eslint": "^5.0.1",
-    "eslint-config-standard": "^11.0.0",
-    "eslint-plugin-import": "^2.13.0",
-    "eslint-plugin-node": "^6.0.1",
-    "eslint-plugin-promise": "^3.8.0",
-    "eslint-plugin-standard": "^3.1.0",
-    "jest": "^23.3.0"
+    "jest": "^23.3.0",
+    "tslint": "^5.14.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.0.1",
+    "typescript": "^3.3.3333"
   },
   "dependencies": {
-    "rxjs": "^5.5.10"
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "rxjs": "^6.4.0"
   },
   "files": [
     "lib",

@@ -10,13 +10,18 @@
 > 而 bufferMap 会对源发出的值的缓存映射成 Observable
 
 ```javascript
-Rx.Observable
-  .interval(1000)
-  .bufferMap((arr) => {
-     console.log('map:', arr);
-     return Rx.Observable.timer(10000).map(() =>  arr)
+import { interval, timer } from 'rxjs'
+import { map } from 'rxjs/operators'
+import { bufferMap } from 'rxjs-operators'
+
+interval(1000).pipe(
+  bufferMap((arr) => {
+   console.log('map:', arr);
+   return timer(10000).pipe(
+     map(() =>  arr)
+   )
   })
-  .subscribe(res => console.log('sub:', res))
+).subscribe(res => console.log('sub:', res))
 ```
 
 output:
