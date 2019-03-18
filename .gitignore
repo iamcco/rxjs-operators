@@ -63,3 +63,4 @@ typings/
 .env
 
 package-lock.json
+lib/
