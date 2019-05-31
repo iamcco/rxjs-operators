@@ -3,43 +3,10 @@ import { concatMap, filter, map } from 'rxjs/operators'
 
 const NOOP = () => {}
 
-const wsEndpoint = ''
-
-export class WebSocketSubject {
-  private url: string = wsEndpoint
-  private protocol: string = 'json'
-  private reconnectTimeGap: number = 5000
-  private subject: Subject<any> = new Subject()
-  private streamObservable = this.subject.pipe(
-    concatMap(data => {
-      return data instanceof Blob
-        ? new Promise<string | ArrayBuffer | Blob | null>(resolve => {
-            const reader = new FileReader()
-            reader.onload = () => {
-              resolve(reader.result)
-            }
-            reader.onerror = e => {
-              // tslint:disable-next-line:no-console
-              console.error(e)
-              resolve(data)
-            }
-            reader.readAsText(data)
-          })
-        : of(data)
-    }),
-    map(data => {
-      try {
-        return JSON.parse(data as string)
-      } catch (e) {
-        // tslint:disable-next-line:no-console
-        console.error(e)
-        return undefined
-      }
-    }),
-    filter(item => !!item)
-  )
+export class WebSocketSubject<T> extends Subject<any> {
+  private values$: Observable<T>
   private socket: WebSocket | undefined
-  private allSubscribe: {
+  private records: {
     [key: string]: {
       count: number
       sendData: () => void
@@ -53,21 +20,43 @@ export class WebSocketSubject {
   private requestBaseId: number = 0
   private isTryReconnect: boolean = false
 
-  init ({
-    url,
-    protocol,
-    reconnectTimeGap
-  }: {
-    url?: string
-    protocol?: string
-    reconnectTimeGap?: number
-  }): void {
-    this.url = url || this.url
-    this.protocol = protocol || this.protocol
-    this.reconnectTimeGap = reconnectTimeGap || this.reconnectTimeGap
+  constructor(
+    private url: string,
+    private protocol: string = 'json',
+    private retryGap: number = 5000
+  ) {
+    super()
+    this.values$ = this.pipe(
+      concatMap(data => {
+        return data instanceof Blob
+          ? new Promise<string | ArrayBuffer | Blob | null>(resolve => {
+            const reader = new FileReader()
+            reader.onload = () => {
+              resolve(reader.result)
+            }
+            reader.onerror = e => {
+              // tslint:disable-next-line:no-console
+              console.error(e)
+              resolve(data)
+            }
+            reader.readAsText(data)
+          })
+          : of(data)
+      }),
+      map(data => {
+        try {
+          return JSON.parse(data as string)
+        } catch (e) {
+          // tslint:disable-next-line:no-console
+          console.error(e)
+          return undefined
+        }
+      }),
+      filter(item => !!item)
+    )
   }
 
-  subscribe (params: any, delay?: number | undefined): Observable<any> {
+  multiplex (params: any, delay?: number | undefined): Observable<any> {
     this.initSocket()
 
     const requestId = this.createRequestId()
@@ -79,15 +68,15 @@ export class WebSocketSubject {
       let subscription: any
       const run = () => {
         const clearSubscribe = () => {
-          if (this.allSubscribe[requestId] !== undefined) {
-            this.allSubscribe[requestId].count -= 1
-            if (this.allSubscribe[requestId].count === 0) {
-              delete this.allSubscribe[requestId]
+          if (this.records[requestId] !== undefined) {
+            this.records[requestId].count -= 1
+            if (this.records[requestId].count === 0) {
+              delete this.records[requestId]
             }
           }
           this.queueSubscribe = this.queueSubscribe.filter(r => r.run !== run)
           if (
-            Object.keys(this.allSubscribe).length === 0 &&
+            Object.keys(this.records).length === 0 &&
             this.socket!.readyState === WebSocket.OPEN
           ) {
             this.socket!.close()
@@ -97,7 +86,7 @@ export class WebSocketSubject {
           observer.error(err)
           clearSubscribe()
         }
-        subscription = this.streamObservable.subscribe({
+        subscription = this.values$.subscribe({
           next: (data: any) => {
             const { requestId: resRequestid, ...newRes } = data
             if (requestId === resRequestid) {
@@ -110,10 +99,10 @@ export class WebSocketSubject {
             clearSubscribe()
           }
         })
-        if (this.allSubscribe[requestId] !== undefined) {
-          this.allSubscribe[requestId].count += 1
+        if (this.records[requestId] !== undefined) {
+          this.records[requestId].count += 1
         } else {
-          this.allSubscribe[requestId] = {
+          this.records[requestId] = {
             count: 1,
             sendData,
             delay
@@ -138,15 +127,15 @@ export class WebSocketSubject {
           if (subscription && subscription.unsubscribe) {
             subscription.unsubscribe()
           }
-          if (this.allSubscribe[requestId] !== undefined) {
-            this.allSubscribe[requestId].count -= 1
-            if (this.allSubscribe[requestId].count === 0) {
-              delete this.allSubscribe[requestId]
+          if (this.records[requestId] !== undefined) {
+            this.records[requestId].count -= 1
+            if (this.records[requestId].count === 0) {
+              delete this.records[requestId]
             }
           }
           this.queueSubscribe = this.queueSubscribe.filter(r => r.run !== run)
           if (
-            Object.keys(this.allSubscribe).length === 0 &&
+            Object.keys(this.records).length === 0 &&
             this.socket!.readyState === WebSocket.OPEN
           ) {
             this.socket!.close()
@@ -159,8 +148,8 @@ export class WebSocketSubject {
   }
 
   private onopen = () => {
-    Object.keys(this.allSubscribe).forEach(requestId => {
-      const { sendData, delay } = this.allSubscribe[requestId]
+    Object.keys(this.records).forEach(requestId => {
+      const { sendData, delay } = this.records[requestId]
       if (delay !== undefined) {
         setTimeout(() => {
           sendData()
@@ -186,7 +175,7 @@ export class WebSocketSubject {
   }: {
     data: ArrayBuffer | string | null | Blob
   }) => {
-    this.subject.next(data)
+    this.next(data)
   }
 
   private onclose = () => {
@@ -208,7 +197,7 @@ export class WebSocketSubject {
   private tryReconnect = () => {
     if (
       this.isTryReconnect ||
-      (Object.keys(this.allSubscribe).length === 0 &&
+      (Object.keys(this.records).length === 0 &&
         this.queueSubscribe.length === 0)
     ) {
       return
@@ -217,7 +206,7 @@ export class WebSocketSubject {
     setTimeout(() => {
       this.isTryReconnect = false
       this.reconnect()
-    }, this.reconnectTimeGap)
+    }, this.retryGap)
   }
   private createRequestId () {
     this.requestBaseId += 1
