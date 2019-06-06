@@ -23,8 +23,8 @@
   },
   "homepage": "https://github.com/iamcco/rxjs-operators#readme",
   "devDependencies": {
-    "jest": "^23.3.0",
-    "tslint": "^5.14.0",
+    "jest": "^24.8.0",
+    "tslint": "^5.17.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.0.1",
     "typescript": "^3.3.3333"
