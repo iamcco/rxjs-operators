@@ -2,8 +2,8 @@ import { Observable, PartialObserver, Subscription } from 'rxjs';
 
 /**
  *
- * only keep the lastest source observable value until the inner observable complete,
- * then trigger the lastest source observable value
+ * only keep the latest source observable value until the inner observable complete,
+ * then trigger the latest source observable value
  *
  * @param isAbandon - is abandon inner observable value when there is newer source observable value
  *

@@ -1,8 +1,13 @@
 import {
   Observable,
   PartialObserver,
-  Subscription
+  Subscription,
+  Observer
 } from 'rxjs';
+
+const a: Observable<any> = Observable.create((observer: Observer<any>) => {
+  observer.next('hello world]')
+})
 
 /**
  * will cache the source observable values until inner observable is complete,
